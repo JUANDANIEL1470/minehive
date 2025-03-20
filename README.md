@@ -97,3 +97,108 @@ Eventos Comunitarios: Organizar concursos y eventos para fomentar la participaci
 
 Conclusión
 MineHive es más que una simple plataforma web; es un espacio creado por y para los amantes de Minecraft. Con su combinación de recursos útiles, herramientas de creación y una comunidad activa, MineHive busca convertirse en el destino definitivo para todos los jugadores de Minecraft, desde principiantes hasta expertos.
+
+
+
+
+
+
+
+BASE DE DATOS:
+
+CREATE DATABASE minehive;
+USE minehive;
+
+-- Tabla usuarios
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    contraseña VARCHAR(255) NOT NULL,
+    foto_perfil VARCHAR(255) DEFAULT 'user.png',
+    rol ENUM('admin', 'moderador', 'usuario', 'verificado') DEFAULT 'usuario',
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ultimo_login TIMESTAMP NULL,
+    estado ENUM('activo', 'inactivo', 'suspendido') DEFAULT 'activo'
+);
+
+-- Tabla mods
+CREATE TABLE mods (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT NOT NULL,
+    ruta_archivo VARCHAR(255) NOT NULL,
+    usuario_id INT NOT NULL,
+    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    descargas INT DEFAULT 0,
+    valoracion_promedio FLOAT DEFAULT 0,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Tabla texturas
+CREATE TABLE texturas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT NOT NULL,
+    ruta_archivo VARCHAR(255) NOT NULL,
+    usuario_id INT NOT NULL,
+    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    descargas INT DEFAULT 0,
+    valoracion_promedio FLOAT DEFAULT 0,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Tabla preguntas
+CREATE TABLE preguntas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    descripcion TEXT NOT NULL,
+    usuario_id INT NOT NULL,
+    fecha_publicacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    estado ENUM('abierta', 'cerrada') DEFAULT 'abierta',
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Tabla respuestas
+CREATE TABLE respuestas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    contenido TEXT NOT NULL,
+    usuario_id INT NOT NULL,
+    pregunta_id INT NOT NULL,
+    fecha_respuesta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    es_correcta BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id) ON DELETE CASCADE
+);
+
+-- Tabla valoraciones
+CREATE TABLE valoraciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    mod_id INT NULL,
+    textura_id INT NULL,
+    puntuacion INT CHECK (puntuacion BETWEEN 1 AND 5),
+    fecha_valoracion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (mod_id) REFERENCES mods(id) ON DELETE CASCADE,
+    FOREIGN KEY (textura_id) REFERENCES texturas(id) ON DELETE CASCADE,
+    CHECK (mod_id IS NOT NULL OR textura_id IS NOT NULL)
+);
+
+-- Tabla insignias
+CREATE TABLE insignias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    descripcion TEXT NOT NULL,
+    imagen VARCHAR(255) NOT NULL
+);
+
+-- Tabla usuario_insignias
+CREATE TABLE usuario_insignias (
+    usuario_id INT NOT NULL,
+    insignia_id INT NOT NULL,
+    fecha_obtencion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (usuario_id, insignia_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (insignia_id) REFERENCES insignias(id) ON DELETE CASCADE
+);
