@@ -227,12 +227,12 @@ CREATE TABLE IF NOT EXISTS `texturas` (
 --
 
 DROP TABLE IF EXISTS `usuarios`;
-CREATE TABLE IF NOT EXISTS `usuarios` (
+CREATE TABLE `usuarios` (
   `id` int NOT NULL AUTO_INCREMENT,
   `nombre_usuario` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
   `contraseña` varchar(255) NOT NULL,
-  `foto_perfil` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `foto_perfil` longblob,
   `rol` enum('admin','moderador','usuario','verificado') DEFAULT 'usuario',
   `fecha_registro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `ultimo_login` timestamp NULL DEFAULT NULL,
@@ -246,7 +246,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `nombre_usuario` (`nombre_usuario`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
