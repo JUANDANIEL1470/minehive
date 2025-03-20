@@ -109,18 +109,32 @@ BASE DE DATOS:
 CREATE DATABASE minehive;
 USE minehive;
 
--- Tabla usuarios
-CREATE TABLE usuarios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_usuario VARCHAR(50) NOT NULL UNIQUE,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    contraseña VARCHAR(255) NOT NULL,
-    foto_perfil VARCHAR(255) DEFAULT 'user.png',
-    rol ENUM('admin', 'moderador', 'usuario', 'verificado') DEFAULT 'usuario',
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ultimo_login TIMESTAMP NULL,
-    estado ENUM('activo', 'inactivo', 'suspendido') DEFAULT 'activo'
-);
+-- Estructura de tabla para la tabla `usuarios`
+--
+
+DROP TABLE IF EXISTS `usuarios`;
+CREATE TABLE IF NOT EXISTS `usuarios` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre_usuario` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `contraseña` varchar(255) NOT NULL,
+  `foto_perfil` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `rol` enum('admin','moderador','usuario','verificado') DEFAULT 'usuario',
+  `fecha_registro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `ultimo_login` timestamp NULL DEFAULT NULL,
+  `estado` enum('activo','inactivo','suspendido') DEFAULT 'activo',
+  `insignia` varchar(255) DEFAULT NULL,
+  `minecraft_java` varchar(50) DEFAULT NULL,
+  `minecraft_bedrock` varchar(50) DEFAULT NULL,
+  `minecraft_dungeons` varchar(50) DEFAULT NULL,
+  `fecha_nacimiento` date DEFAULT NULL,
+  `redes_sociales` json DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nombre_usuario` (`nombre_usuario`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
 
 -- Tabla mods
 CREATE TABLE mods (
