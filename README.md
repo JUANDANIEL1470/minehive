@@ -105,10 +105,124 @@ MineHive es más que una simple plataforma web; es un espacio creado por y para 
 
 
 BASE DE DATOS:
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1:3306
+-- Tiempo de generación: 20-03-2025 a las 21:26:27
+-- Versión del servidor: 9.1.0
+-- Versión de PHP: 8.3.14
 
-CREATE DATABASE minehive;
-USE minehive;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `minehive`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `insignias`
+--
+
+DROP TABLE IF EXISTS `insignias`;
+CREATE TABLE IF NOT EXISTS `insignias` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(50) NOT NULL,
+  `descripcion` text NOT NULL,
+  `imagen` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `mods`
+--
+
+DROP TABLE IF EXISTS `mods`;
+CREATE TABLE IF NOT EXISTS `mods` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `descripcion` text NOT NULL,
+  `ruta_archivo` varchar(255) NOT NULL,
+  `usuario_id` int NOT NULL,
+  `fecha_subida` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `descargas` int DEFAULT '0',
+  `valoracion_promedio` float DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `usuario_id` (`usuario_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `preguntas`
+--
+
+DROP TABLE IF EXISTS `preguntas`;
+CREATE TABLE IF NOT EXISTS `preguntas` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `titulo` varchar(255) NOT NULL,
+  `descripcion` text NOT NULL,
+  `usuario_id` int NOT NULL,
+  `fecha_publicacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `estado` enum('abierta','cerrada') DEFAULT 'abierta',
+  PRIMARY KEY (`id`),
+  KEY `usuario_id` (`usuario_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `respuestas`
+--
+
+DROP TABLE IF EXISTS `respuestas`;
+CREATE TABLE IF NOT EXISTS `respuestas` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `contenido` text NOT NULL,
+  `usuario_id` int NOT NULL,
+  `pregunta_id` int NOT NULL,
+  `fecha_respuesta` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `es_correcta` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `usuario_id` (`usuario_id`),
+  KEY `pregunta_id` (`pregunta_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `texturas`
+--
+
+DROP TABLE IF EXISTS `texturas`;
+CREATE TABLE IF NOT EXISTS `texturas` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `descripcion` text NOT NULL,
+  `ruta_archivo` varchar(255) NOT NULL,
+  `usuario_id` int NOT NULL,
+  `fecha_subida` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `descargas` int DEFAULT '0',
+  `valoracion_promedio` float DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `usuario_id` (`usuario_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `usuarios`
 --
 
@@ -136,83 +250,40 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
 
 -- --------------------------------------------------------
 
--- Tabla mods
-CREATE TABLE mods (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT NOT NULL,
-    ruta_archivo VARCHAR(255) NOT NULL,
-    usuario_id INT NOT NULL,
-    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    descargas INT DEFAULT 0,
-    valoracion_promedio FLOAT DEFAULT 0,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-);
+--
+-- Estructura de tabla para la tabla `usuario_insignias`
+--
 
--- Tabla texturas
-CREATE TABLE texturas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT NOT NULL,
-    ruta_archivo VARCHAR(255) NOT NULL,
-    usuario_id INT NOT NULL,
-    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    descargas INT DEFAULT 0,
-    valoracion_promedio FLOAT DEFAULT 0,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-);
+DROP TABLE IF EXISTS `usuario_insignias`;
+CREATE TABLE IF NOT EXISTS `usuario_insignias` (
+  `usuario_id` int NOT NULL,
+  `insignia_id` int NOT NULL,
+  `fecha_obtencion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`usuario_id`,`insignia_id`),
+  KEY `insignia_id` (`insignia_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Tabla preguntas
-CREATE TABLE preguntas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    descripcion TEXT NOT NULL,
-    usuario_id INT NOT NULL,
-    fecha_publicacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    estado ENUM('abierta', 'cerrada') DEFAULT 'abierta',
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-);
+-- --------------------------------------------------------
 
--- Tabla respuestas
-CREATE TABLE respuestas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    contenido TEXT NOT NULL,
-    usuario_id INT NOT NULL,
-    pregunta_id INT NOT NULL,
-    fecha_respuesta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    es_correcta BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id) ON DELETE CASCADE
-);
+--
+-- Estructura de tabla para la tabla `valoraciones`
+--
 
--- Tabla valoraciones
-CREATE TABLE valoraciones (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario_id INT NOT NULL,
-    mod_id INT NULL,
-    textura_id INT NULL,
-    puntuacion INT CHECK (puntuacion BETWEEN 1 AND 5),
-    fecha_valoracion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    FOREIGN KEY (mod_id) REFERENCES mods(id) ON DELETE CASCADE,
-    FOREIGN KEY (textura_id) REFERENCES texturas(id) ON DELETE CASCADE,
-    CHECK (mod_id IS NOT NULL OR textura_id IS NOT NULL)
-);
+DROP TABLE IF EXISTS `valoraciones`;
+CREATE TABLE IF NOT EXISTS `valoraciones` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `usuario_id` int NOT NULL,
+  `mod_id` int DEFAULT NULL,
+  `textura_id` int DEFAULT NULL,
+  `puntuacion` int DEFAULT NULL,
+  `fecha_valoracion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `usuario_id` (`usuario_id`),
+  KEY `mod_id` (`mod_id`),
+  KEY `textura_id` (`textura_id`)
+) ;
+COMMIT;
 
--- Tabla insignias
-CREATE TABLE insignias (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL,
-    descripcion TEXT NOT NULL,
-    imagen VARCHAR(255) NOT NULL
-);
-
--- Tabla usuario_insignias
-CREATE TABLE usuario_insignias (
-    usuario_id INT NOT NULL,
-    insignia_id INT NOT NULL,
-    fecha_obtencion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (usuario_id, insignia_id),
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    FOREIGN KEY (insignia_id) REFERENCES insignias(id) ON DELETE CASCADE
-);
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
